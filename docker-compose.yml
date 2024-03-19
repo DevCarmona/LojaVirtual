@@ -1,0 +1,41 @@
+version: '3.5'
+
+services:
+  lojavirtual_app:
+    build:
+      context: '.'
+      args:
+        uid: ${UID}
+    container_name: lojavirtual_app
+    ports:
+      - 80:80
+    environment:
+      - APACHE_RUN_USER=#1000
+      - APACHE_RUN_GROUP=#1000
+    volumes:
+      - .:/var/www/html
+    networks:
+      backend:
+        aliases:
+          - app
+  lojavirtual_app-mariadb-db:
+    image: mariadb:10
+    container_name: lojavirtual_app-mariadb-db
+    volumes:
+      - ./run/var:/var/lib/mysql
+    command: --sql_mode=""
+    ports:
+        - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=123
+      - MYSQL_DATABASE=lojavirtual
+      - MYSQL_USER=andre
+      - MYSQL_PASSWORD=123
+    networks:
+      backend:
+        aliases:
+          - mariadb-db
+
+networks:
+  backend:
+    name: backend-network
