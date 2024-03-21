@@ -79,7 +79,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <body>
 
 <div id="container">
-	<h1>Bem vindo a loja</h1>
+	<h1>Bem vindo a loja QRA-Store</h1>
 	</div>
 
 </body>
