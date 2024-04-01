@@ -12,67 +12,106 @@
                             <h4><?php echo $titulo; ?></h4>
                         </div>
 
-                        <form name="form_core">
-                            <div class="card-body">
+                        <?php
 
-                                <div class="form-row">
-                                    <div class="form-group col-md-4">
-                                        <label>Nome</label>
-                                        <input name="first_name" type="text" class="form-control" value="<?php echo (isset($usuario) ? $usuario->first_name : ''); ?>">
-                                    </div>
+                            $atributos = array (
+                                'name' => 'form_core',
+                            );
 
-                                    <div class="form-group col-md-4">
-                                        <label>Sobrenome</label>
-                                        <input name="last_name" type="text" class="form-control" value="<?php echo (isset($usuario) ? $usuario->last_name : '') ?>">
-                                    </div>
+                            if(isset($usuario)) {
+                                $usuario_id = $usuario->id;
+                            }else {
+                                $usuario_id = '';
+                            }
+                        ?>
 
-                                    <div class="form-group col-md-4">
-                                        <label>E-mail</label>
-                                        <input name="email" type="email" class="form-control" value="<?php echo (isset($usuario) ? $usuario->email : '') ?>">
-                                    </div>
+                        <?php echo form_open("restrita/usuarios/core/" . $usuario_id, $atributos); ?>
+
+                        <div class="card-body">
+
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label>Nome</label>
+                                    <input name="first_name" type="text" class="form-control"
+                                        value="<?php echo (isset($usuario) ? $usuario->first_name : ''); ?>">
                                 </div>
 
-                                <div class="form-row">
-                                    <div class="form-group col-md-4">
-                                        <label>Usuário</label>
-                                        <input name="username" type="text" class="form-control" value="<?php echo (isset($usuario) ? $usuario->username : '') ?>">
-                                    </div>
-
-                                    <div class="form-group col-md-4">
-                                        <label>Senha</label>
-                                        <input name="password" type="password" class="form-control" value="<?php echo (isset($usuario) ? $usuario->password : '') ?>">
-                                    </div>
-
-                                    <div class="form-group col-md-4">
-                                        <label>Confirmação da senha</label>
-                                        <input name="confirma" type="password" class="form-control" value="<?php echo (isset($usuario) ? $usuario->password : '') ?>">
-                                    </div>
+                                <div class="form-group col-md-4">
+                                    <label>Sobrenome</label>
+                                    <input name="last_name" type="text" class="form-control"
+                                        value="<?php echo (isset($usuario) ? $usuario->last_name : '') ?>">
                                 </div>
 
-                                <div class="form-row">
-                                    <div class="form-group col-md-4">
-                                        <label for="inputState">Situação</label>
-                                        <select id="inputState" name="active" class="form-control">
-                                            <option value="1" <?php echo ($usuario->active == 1 ? 'selected' : ''); ?>>Ativo</option>
-                                            <option value="0" <?php echo ($usuario->active == 0 ? 'selected' : ''); ?>>Inativo</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group col-md-4">
-                                        <label for="inputState">Perfil de acesso</label>
-                                        <select id="inputState" name="group" class="form-control">
-                                            <option>Cliente</option>
-                                            <option>Admin</option>
-                                        </select>
-                                    </div>
+                                <div class="form-group col-md-4">
+                                    <label>E-mail</label>
+                                    <input name="email" type="email" class="form-control"
+                                        value="<?php echo (isset($usuario) ? $usuario->email : '') ?>">
                                 </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label>Usuário</label>
+                                    <input name="username" type="text" class="form-control"
+                                        value="<?php echo (isset($usuario) ? $usuario->username : '') ?>">
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label>Senha</label>
+                                    <input name="password" type="password" class="form-control" value="">
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label>Confirmação da senha</label>
+                                    <input name="confirma" type="password" class="form-control" value="">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="inputState">Situação</label>
+                                    <select id="inputState" name="active" class="form-control">
+                                        <?php if(isset($usuario)): ?>
+                                        <option value="1" <?php echo ($usuario->active == 1 ? 'selected' : ''); ?>>Ativo
+                                        </option>
+                                        <option value="0" <?php echo ($usuario->active == 0 ? 'selected' : ''); ?>>
+                                            Inativo</option>
+                                        <?php else: ?>
+                                        <option value="1">Ativo</option>
+                                        <option value="0">Inativo</option>
+                                        <?php endif; ?>
+
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label>Perfil de acesso</label>
+                                    <select name="perfil" class="form-control">
+                                        <?php foreach($grupos as $grupo): ?>
+                                        <?php if(isset($usuario)): ?>
+                                        <option value="<?php echo $grupo->id; ?>"
+                                            <?php echo ($grupo->id == $perfil->id ? 'selected' : ''); ?>>
+                                            <?php echo $grupo->name ?></option>
+                                        <?php else: ?>
+                                        <option value="<?php echo $grupo->id; ?>"><?php echo $grupo->name; ?></option>
+                                        <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <?php if(isset($usuario)): ?>
+                                <input type="hidden" name="usuario_id" value="<?php echo $usuario->id ?>">
+                                <?php endif;?>
 
                             </div>
 
-                            <div class="card-footer">
-                                <button class="btn btn-primary">Submit</button>
-                            </div>
-                        </form>
+                        </div>
+
+                        <div class="card-footer">
+                            <button class="btn btn-primary mr-2">Salvar</button>
+                            <a class="btn btn-dark" href="<?php echo base_url('restrita/usuarios'); ?>">Voltar</a>
+                        </div>
+                        <?php echo form_close(); ?>
                     </div>
                 </div>
             </div>
