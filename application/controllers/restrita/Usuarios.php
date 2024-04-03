@@ -49,12 +49,50 @@ class Usuarios extends CI_Controller {
 
             }else {
                 //  users edit / Editar usuarios
-                $this->form_validation->set_rules('first_name', 'Nome', 'trim|required');
+                $this->form_validation->set_rules('first_name', 'Nome', 'trim|required|min_length[3]|max_length[45]');
+                $this->form_validation->set_rules('last_name', 'Sobrenome', 'trim|required|min_length[3]|max_length[45]');
+                $this->form_validation->set_rules('email', 'E-mail', 'trim|required|min_length[3]|max_length[100]|valid_email|callback_valida_email');
+                $this->form_validation->set_rules('username', 'Usuário','trim|required|min_length[3]|max_length[50]|callback_valida_usuario');
+                $this->form_validation->set_rules('password', 'Senha', 'trim|min_length[6]|max_length[100]');
+                $this->form_validation->set_rules('confirma', 'Confirmação de senha', 'trim|matches[password]');
 
                 if($this->form_validation->run()) {
-                    echo '<pre>';
-                    print_r($this->input->post());
-                    exit();
+                    // echo '<pre>';
+                    // print_r($this->input->post());
+                    // exit();
+                    $data = elements(
+                        array(
+                            'first_name',
+                            'last_name',
+                            'email',
+                            'username',
+                            'password',
+                            'active',
+                        ), $this->input->post()
+                    );
+
+                    $password = $this->input->post('password');
+                    //  Does not update the password if it is not passed / Não atualiza a senha se não for passada.
+                    if(!$password) {
+                        unset($data['password']);
+                    }
+                    //  Sanitizing the $data / Sanitizando o $data
+                    $data = html_escape($data);
+                
+                    if( $this->ion_auth->update($usuario_id, $data)) {
+                        $perfil = $this->input->post('perfil');
+
+                        if($perfil) {
+                            $this->ion_auth->remove_from_group(NULL, $usuario_id);
+                            $this->ion_auth->add_to_group($perfil, $usuario_id);
+                        }
+
+                        $this->session->set_flashdata('sucesso', 'Dados salvos com sucesso!');
+                    }else {
+                        $this->session->set_flashdata('error', $this->ion_auth->errors());
+                    }
+                    redirect('restrita/usuarios');
+
                 }else {
                     // Validate error / Erro de validação
                     $data = array (
@@ -69,6 +107,50 @@ class Usuarios extends CI_Controller {
                     $this->load->view('restrita/layout/footer');
                 }
 
+            }
+        }
+    }
+
+    public function valida_email($email)
+    {
+        $usuario_id = $this->input->post('usuario_id');
+        if(!$usuario_id) {
+            //  Sign up / Cadastrando
+            if($this->core_model->get_by_id('users', array('email' => $email))) {
+                $this->form_validation->set_message('valida_email', 'Esse e-mail já existe');
+                return false;
+            }else {
+                return true;
+            }
+        }else {
+            //  Editing / Editando
+            if($this->core_model->get_by_id('users', array('email' => $email, 'id !=' => $usuario_id))) {
+                $this->form_validation->set_message('valida_email', 'Esse e-mail já existe');
+                return false;
+            }else {
+                return true;
+            }
+        }
+    }
+
+    public function valida_usuario($username)
+    {
+        $usuario_id = $this->input->post('usuario_id');
+        if(!$usuario_id) {
+            //  Sign up / Cadastrando
+            if($this->core_model->get_by_id('users', array('username' => $username))) {
+                $this->form_validation->set_message('valida_usuario', 'Esse usuário já existe');
+                return false;
+            }else {
+                return true;
+            }
+        }else {
+            //  Editing / Editando
+            if($this->core_model->get_by_id('users', array('username' => $username, 'id !=' => $usuario_id))) {
+                $this->form_validation->set_message('valida_usuario', 'Esse usuário já existe');
+                return false;
+            }else {
+                return true;
             }
         }
     }
