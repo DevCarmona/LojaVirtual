@@ -1212,8 +1212,6 @@ class XML_RPC_Message extends CI_Xmlrpc
 		// Display XML content for debugging
 		if ($this->debug === TRUE)
 		{
-			echo '<pre>';
-
 			if (count($this->xh[$pname]['headers']) > 0)
 			{
 				echo "---HEADERS---\n";

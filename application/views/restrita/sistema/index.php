@@ -15,6 +15,32 @@
                         <?php echo form_open("restrita/sistema/"); ?>
 
                         <div class="card-body">
+
+                        <?php if($message = $this->session->flashdata('sucesso')): ?>
+                            <div class="alert alert-success alert-has-icon alert-dismissible show fade">
+                                <div class="alert-icon"><i class="fa fa-check-circle fa-lg"></i></div>
+                                <div class="alert-body">
+                                    <div class="alert-title">Perfeito!</div>
+                                    <button class="close" data-dismiss="alert">
+                                        <span>&times;</span>
+                                    </button>
+                                    <?php echo $message; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if($message = $this->session->flashdata('error')): ?>
+                            <div class="alert alert-danger alert-has-icon alert-dismissible show fade">
+                                <div class="alert-icon"><i class="fa fa-exclamation-circle fa-lg"></i></div>
+                                <div class="alert-body">
+                                    <div class="alert-title">Atenção</div>
+                                    <button class="close" data-dismiss="alert">
+                                        <span>&times;</span>
+                                    </button>
+                                    <?php echo $message; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
             
                             <div class="form-row">
                                 <div class="form-group col-md-3">

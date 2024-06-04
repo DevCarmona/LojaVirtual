@@ -8,6 +8,9 @@ class Usuarios extends CI_Controller {
         parent::__construct();
         
         //  Valid session? / Sessão válida ?
+        if(!$this->ion_auth->logged_in()) {
+            redirect('restrita/login');
+        }
     }
 
     public function index()

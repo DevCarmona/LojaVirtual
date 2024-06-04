@@ -1,11 +1,11 @@
 <?php if($this->router->fetch_class() != 'login') :?>
-    <footer class="main-footer">
-        <div class="footer-left">
-            <a href="templateshub.net">DevCarmona</a></a>
-        </div>
-        <div class="footer-right">
-        </div>
-    </footer>
+<footer class="main-footer">
+    <div class="footer-left">
+        <a href="templateshub.net">DevCarmona</a></a>
+    </div>
+    <div class="footer-right">
+    </div>
+</footer>
 <?php endif; ?>
 
 </div>
@@ -17,10 +17,12 @@
 <!-- Template JS File -->
 <script src="<?php echo base_url('public/assets/js/scripts.js');?>"></script>
 
+<script src="<?php echo base_url('public/assets/js/util.js');?>"></script>
+
 <?php if(isset($scripts)):?>
-<?php foreach($scripts as $script):?>
-<script src="<?php echo base_url('public/assets/' . $script);?>"></script>
-<?php endforeach;?>
+    <?php foreach($scripts as $script):?>
+        <script src="<?php echo base_url('public/assets/' . $script);?>"></script>
+    <?php endforeach;?>
 <?php endif;?>
 
 <!-- Custom JS File -->
