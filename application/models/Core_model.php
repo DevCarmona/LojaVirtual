@@ -30,12 +30,12 @@ class Core_model extends CI_Model {
     public function insert($tabela = NULL, $data = NULL, $get_last_id = NULL)
     {
         if($tabela && $this->db->table_exists($tabela) && is_array($data)) {
+            $this->db->insert($tabela, $data);
+
             //  Inserts the last id inserted into the db into the session / Insere na sessao o ultimo id inserido na base de dados
             if($get_last_id) {
                 $this->session->set_userdata('last_id', $this->db->insert_id());
             }
-
-            $this->db->insert($tabela, $data);
 
             // Check if it has been entered into the db / Verifica se foi inserido no banco de dados
             if($this->db->affected_rows() > 0) {
@@ -72,5 +72,15 @@ class Core_model extends CI_Model {
         }else {
             return false;
         }
+    }
+
+    public function generate_unique_code($tabela = NULL, $tipo_codigo = NULL, $tamanho_codigo = NULL, $campo_procura = NULL) 
+    {
+        do{
+            $codigo = random_string($tipo_codigo, $tamanho_codigo);
+            $this->db->where($campo_procura, $codigo);
+            $this->db->from($tabela);
+        } while($this->db->count_all_results() >= 1);
+        return $codigo;
     }
 }

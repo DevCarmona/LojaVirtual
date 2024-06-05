@@ -43,6 +43,102 @@ class Produtos extends CI_Controller {
 
         if(!$produto_id) {
             //  Signing up / Cadastrando
+            // Validation / Validação
+            $this->form_validation->set_rules('produto_nome', '<strong>Nome do produto</strong>', 'trim|required|min_length[2]|max_length[240]|callback_valida_nome_produto');
+            $this->form_validation->set_rules('produto_categoria_id', '<strong>Categoria do produto</strong>', 'trim|required');
+            $this->form_validation->set_rules('produto_marca_id', '<strong>Marca do produto</strong>', 'trim|required');
+            $this->form_validation->set_rules('produto_valor', '<strong>Valor do produto</strong>', 'trim|required');
+            $this->form_validation->set_rules('produto_peso', '<strong>Peso do produto</strong>', 'trim|required|integer');
+            $this->form_validation->set_rules('produto_altura', '<strong>Altura do produto</strong>', 'trim|required|integer');
+            $this->form_validation->set_rules('produto_largura', '<strong>Largura do produto</strong>', 'trim|required|integer');
+            $this->form_validation->set_rules('produto_comprimento', '<strong>Comprimento do produto</strong>', 'trim|required|integer');
+            $this->form_validation->set_rules('produto_quantidade_estoque', '<strong>Quantidade em estoque</strong>', 'trim|required|integer');
+            $this->form_validation->set_rules('produto_descricao', '<strong>Descrição do produto</strong>', 'trim|required|min_length[10]|max_length[5000]');
+
+            $fotos_produtos = $this->input->post('fotos_produtos');
+
+            if(!$fotos_produtos) {
+                $this->form_validation->set_rules('fotos_produtos', '<strong>Imagens do produto</strong>', 'required');
+            }
+
+            if($this->form_validation->run()) {
+                $data = elements(
+                    array(
+                        'produto_nome',
+                        'produto_categoria_id',
+                        'produto_marca_id',
+                        'produto_valor',
+                        'produto_peso',
+                        'produto_altura',
+                        'produto_largura',
+                        'produto_comprimento',
+                        'produto_quantidade_estoque',
+                        'produto_ativo',
+                        'produto_destaque',
+                        'produto_controlar_estoque',
+                        'produto_descricao',
+                    ), $this->input->post()
+                );
+
+                //  Remove comma the value / Remova a virgula do valor
+                $data['produto_valor'] = str_replace(',','', $data['produto_valor']);
+
+                //  Create metalink the product / Criando metalink do produto
+                $data['produto_meta_link'] = url_amigavel($data['produto_nome']);
+
+                //  Generate code / Codigo gerado
+                $data['produto_codigo'] = $this->input->post('produto_codigo');
+
+                $data = html_escape($data);
+
+                //  Insert product / Adiciona o produto
+                $this->core_model->insert('produtos', $data, TRUE);
+
+                // Recover last id insert / Recupera o ultimo id inserido
+                $produto_id = $this->session->userdata('last_id');
+
+                //(Recover from post if photos came)Rules for delete photos / (Recuperar do post se veio fotos)Regras para excluir fotos
+                $fotos_produtos = $this->input->post('fotos_produtos');
+                
+                if($fotos_produtos) {
+                    $total_fotos = count($fotos_produtos);
+
+                    for($i = 0; $i < $total_fotos; $i++) {
+                        $data = array(
+                            'foto_produto_id' => $produto_id,
+                            'foto_caminho' => $fotos_produtos[$i],
+                        );
+                        $this->core_model->insert('produtos_fotos', $data);
+                    }
+                }
+                redirect('restrita/produtos');
+
+            } else{
+                // Validation error / Erro de validação                   
+                $data = array (
+                    'titulo' => 'Cadastrar produto',
+        
+                    'styles' => array (
+                        'jquery-upload-file/css/uploadfile.css',
+                    ),
+                    'scripts' => array (
+                        'sweetalert2/sweetalert2.all.min.js',
+                        'jquery-upload-file/js/jquery.uploadfile.min.js',
+                        'jquery-upload-file/js/produtos.js',
+                        'mask/jquery.mask.min.js',
+                        'mask/custom.js',
+                    ),
+                    
+                    'codigo_gerado' => $this->core_model->generate_unique_code('produtos', 'numeric', 8, 'produto_codigo'),
+                    'categorias' => $this->core_model->get_all('categorias', array('categoria_ativa' => 1)),
+                    'marcas' => $this->core_model->get_all('marcas', array('marca_ativa' => 1))
+                );
+        
+                //  Defining view loading / Definindo carregamento da view
+                $this->load->view('restrita/layout/header', $data);
+                $this->load->view('restrita/produtos/core');
+                $this->load->view('restrita/layout/footer');
+            }
         }else {
             if(!$produto = $this->core_model->get_by_id('produtos', array('produto_id' => $produto_id))){
                 $this->session->set_flashdata('error', 'Esse produto não foi encontrado');
@@ -50,7 +146,7 @@ class Produtos extends CI_Controller {
             }else {
                 //  Editing product/ Editar produto
                 // Validation / Validação
-                $this->form_validation->set_rules('produto_nome', '<strong>Nome do produto</strong>', 'trim|required|min_length[2]|max_length[40]|callback_valida_nome_produto');
+                $this->form_validation->set_rules('produto_nome', '<strong>Nome do produto</strong>', 'trim|required|min_length[2]|max_length[240]|callback_valida_nome_produto');
                 $this->form_validation->set_rules('produto_categoria_id', '<strong>Categoria do produto</strong>', 'trim|required');
                 $this->form_validation->set_rules('produto_marca_id', '<strong>Marca do produto</strong>', 'trim|required');
                 $this->form_validation->set_rules('produto_valor', '<strong>Valor do produto</strong>', 'trim|required');
@@ -220,4 +316,37 @@ class Produtos extends CI_Controller {
         echo json_encode($data);
     }
 
+    public function delete($produto_id = NULL)
+    {
+        //  Cast
+        $produto_id = (int) $produto_id;
+
+        if(!$produto_id || !$this->core_model->get_by_id('produtos', array('produto_id' => $produto_id))) {
+            $this->session->set_flashdata('error', 'Esse produto não foi encontrado');
+            redirect('restrita/produtos');
+        }
+
+        if($this->core_model->get_by_id('produtos', array('produto_id' => $produto_id, 'produto_ativo' => 1))) {
+            $this->session->set_flashdata('error', 'Não é permitido excluir um produto ativo');
+            redirect('restrita/produtos');
+        }
+        //  Recover product photos befor delete / Recupera as fotos do produto antes da exclusão
+        $fotos_produto = $this->core_model->get_all('produtos_fotos', array('foto_produto_id' => $produto_id));
+
+        //  Delete product / Exclui o produto
+        $this->core_model->delete('produtos', array('produto_id' => $produto_id));
+
+        //  Delete products photos / Exclui as fotos dos produtos
+        if($fotos_produto) {
+            foreach($fotos_produto as $foto) {
+                $foto_grande = FCPATH . 'uploads/produtos/' . $foto->foto_caminho;
+
+                //  Delete images / Exclui as imagens
+                if(file_exists($foto_grande)) {
+                    unlink($foto_grande);
+                }
+            }
+        }
+        redirect('restrita/produtos');
+    }
 }
