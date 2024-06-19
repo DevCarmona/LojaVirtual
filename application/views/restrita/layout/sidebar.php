@@ -8,8 +8,8 @@
         <ul class="sidebar-menu">
             <li class="menu-header">Main</li>
 
-            <li class="dropdown <?php echo $this->router->fetch_class() == 'home' && $this->router->fetch_method() == 'index' ? 'active' : '' ?>">
-                <a href="<?php echo base_url('restrita') ?>" class="nav-link"><i data-feather="home"></i><span>Home</span></a>
+            <li class="dropdown <?php echo $this->router->fetch_class() == 'home' && $this->router->fetch_method() == 'home' ? 'active' : '' ?>">
+                <a href="<?php echo base_url('restrita/web/home') ?>" class="nav-link"><i data-feather="home"></i><span>Home</span></a>
             </li>
 
             
@@ -40,6 +40,7 @@
                 <ul class="dropdown-menu">
                     <li><a class="nav-link <?php echo $this->router->fetch_class() == 'sistema' && $this->router->fetch_method() == 'index' ? 'active' : '' ?>" href="<?php echo base_url('restrita/sistema')?>">Sistema</a></li>
                     <li><a class="nav-link <?php echo $this->router->fetch_class() == 'sistema' && $this->router->fetch_method() == 'index' ? 'active' : '' ?>" href="<?php echo base_url('restrita/sistema/correios')?>">Correios</a></li>
+                    <li><a class="nav-link <?php echo $this->router->fetch_class() == 'sistema' && $this->router->fetch_method() == 'index' ? 'active' : '' ?>" href="<?php echo base_url('restrita/sistema/pagseguro')?>">Pagseguro</a></li>
                 </ul>
             </li>
         </ul>

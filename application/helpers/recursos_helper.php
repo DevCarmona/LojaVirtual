@@ -2,6 +2,40 @@
 
 defined('BASEPATH') or exit('Ação não permitida');
 
+//  Sending sistem info to the header and footer / Enviando informações do sistema para o cabeçalho e rodapé
+function info_header_footer() {
+    $CI = & get_instance();
+
+    $sistema = $CI->core_model->get_by_id('sistema', array('sistema_id' => 1));
+    return $sistema;
+}
+
+//  Big brands for navbar / Grandes marcas para NavBar
+function grandes_marcas_navbar() {
+    $CI = & get_instance();
+
+    $grandes_marcas = $CI->loja_model->get_grandes_marcas();
+
+    return $grandes_marcas;
+}
+
+//  Parents categories NavBar / Categorias pai NavBar
+function categorias_pai_navbar() {
+    $CI = & get_instance();
+
+    $categorias_pai = $CI->loja_model->get_categorias_pai();
+
+    return $categorias_pai;
+}
+
+//  Recotrieves child categorias acording to categoria_pai_id as a parameter / Recupera as categorias filhas de acordo com a categoria_pai_id como parametro
+function categorias_filhas_navbar($categoria_pai_id = NULL) {
+    $CI = & get_instance();
+
+    $categorias_filhas = $CI->loja_model->get_categorias_filhas($categoria_pai_id);
+
+    return $categorias_filhas;
+}
 
 function url_amigavel($string = NULL) {
     $string = remove_acentos($string);

@@ -5,10 +5,14 @@ class Welcome extends CI_Controller {
 
 	public function index()
 	{
-		$this->load->view('welcome_message');
-	}
+		$sistema = info_header_footer();
 
-	public function teste() {
-		$this->load->view('teste');
+		$data = array(
+			'titulo' => 'Seja muito bem vindo(a) à Loja Virtual ' . $sistema->sistema_nome_fantasia, 
+		);
+
+		$this->load->view('web/layout/header', $data);
+		$this->load->view('web/index');
+		$this->load->view('web/layout/footer');
 	}
 }
